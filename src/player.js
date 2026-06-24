@@ -3,35 +3,52 @@ class Player {
     this.x = x;
     this.y = y;
     this.size = 30;
-    this.baseSpeed = 1;
+    this.baseSpeed = 1.1;
+    this.middleSpeed = 2.1;
+    this.maxSpeed = 3.6;
+    this.vx = 0;
+    this.vy = 0;
+    this.smoothing = 0.16;
   }
 
-  update(data)   {
+  update(data) {
     if (!data) return;
 
-    const accelX = data.ax || 0;
-    const accelY = data.ay || 0;
+    let targetX = 0;
+    let targetY = 0;
 
-    let moveX = 0;
-    let moveY = 0;
+    if (joystickMode) {
+      const rawX = Number(data.jx) || 0;
+      const rawY = Number(data.jy) || 0;
+      const magnitude = Math.hypot(rawX, rawY);
+      let speed = 0;
 
-    const speedX = this.baseSpeed + Math.abs(accelX) * 2.5;
-    const speedY = this.baseSpeed + Math.abs(accelY) * 2.5;
+      if (magnitude <= 10) {
+        speed = 0;
+      } else if (magnitude <= 60) {
+        speed = this.middleSpeed;
+      } else {
+        speed = this.maxSpeed;
+      }
 
-    if (data.roll_dir === "Tilted Left") {
-      moveX = -speedX;
-    } else if (data.roll_dir === "Tilted Right") {
-      moveX = speedX;
+      if (speed > 0) {
+        const angle = Math.atan2(rawY, rawX);
+        targetX = Math.cos(angle) * speed;
+        targetY = Math.sin(angle) * speed;
+      }
+    } else {
+      const rollDeg = Number(data.roll_deg) || 0;
+      const pitchDeg = Number(data.pitch_deg) || 0;
+
+      targetX = constrain(rollDeg / 60, -1, 1) * this.middleSpeed;
+      targetY = constrain(pitchDeg / 60, -1, 1) * this.middleSpeed;
     }
 
-    if (data.pitch_dir === "Tilted Forward") {
-      moveY = -speedY;
-    } else if (data.pitch_dir === "Tilted Backward") {
-      moveY = speedY;
-    }
+    this.vx = lerp(this.vx, targetX, this.smoothing);
+    this.vy = lerp(this.vy, targetY, this.smoothing);
 
-    this.x += moveX;
-    this.y += moveY;
+    this.x += this.vx;
+    this.y += this.vy;
 
     this.x = constrain(this.x, 0, width - this.size);
     this.y = constrain(this.y, 0, height - this.size);

@@ -10,6 +10,9 @@ class Serial {
         this.pitch_deg = 0;
         this.roll_dir = "";
         this.pitch_dir = "";
+        this.jx = 0;
+        this.jy = 0;
+        this.jb = false;
     }
 
     translate(data) {
@@ -21,7 +24,7 @@ class Serial {
         const values = line.split(",");
         if (values.length < 10) return;
 
-        const [ax, ay, az, gx, gy, gz, roll_deg, pitch_deg, roll_dir, pitch_dir] = values;
+        const [ax, ay, az, gx, gy, gz, roll_deg, pitch_deg, roll_dir, pitch_dir, jx, jy, jb] = values;
 
         this.ax = parseFloat(ax);
         this.ay = parseFloat(ay);
@@ -33,5 +36,8 @@ class Serial {
         this.pitch_deg = parseFloat(pitch_deg);
         this.roll_dir = roll_dir.trim();
         this.pitch_dir = pitch_dir.trim();
+        this.jx = parseFloat(jx);
+        this.jy = parseFloat(jy);
+        this.jb = jb === "Pressed";
     }
 }

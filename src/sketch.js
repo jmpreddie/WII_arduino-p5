@@ -8,6 +8,8 @@ let player;
 let connectButton;
 let latestLine = "No data yet";
 let statusMessage = "Not connected";
+let joystickMode = false;
+let lastJoystickButtonState = false;
 
 function setup() {
   createCanvas(400, 400);
@@ -22,6 +24,10 @@ function draw() {
   background(220);
 
   if (serial) {
+    if (serial.jb && !lastJoystickButtonState) {
+      joystickMode = !joystickMode;
+    }
+    lastJoystickButtonState = serial.jb;
     player.update(serial);
   }
   player.draw();
@@ -29,6 +35,7 @@ function draw() {
   fill(0);
   textSize(12);
   text("Status: " + statusMessage, 20, height - 20);
+  text("Mode: " + (joystickMode ? "Joystick" : "Gyro"), 20, height - 40);
 
   // console.log(latestLine);
   // let dataText =
