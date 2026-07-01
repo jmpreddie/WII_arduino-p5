@@ -35,7 +35,7 @@ MyData data;
 // modified for https://dfrobot.com by Lumi, Jan. 2014
 // further modified with corrected validity detection
 // MODERATE sensitivity preset
-
+//
 int IRsensorAddress = 0xB0;
 int slaveAddress;
 int ledPin = 13;
